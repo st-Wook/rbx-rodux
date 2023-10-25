@@ -2,6 +2,7 @@ import combineReducers from "./combineReducers";
 import createReducer from "./createReducer";
 import Store from "./Store";
 import makeActionCreator from "./makeActionCreator";
+import makeThunkMiddleware from "./makeThunkMiddleware";
 
 /**
  * The `Rodux` library for Roblox
@@ -12,22 +13,23 @@ declare namespace Rodux {
 		combineReducers,
 		Store,
 		makeActionCreator,
+		makeThunkMiddleware,
 	};
 }
 
 declare namespace Rodux {
 	/**
 	 * A middleware that logs actions and the new state that results from them.
-	 * 
-	 * `loggerMiddleware` is useful for getting a quick look at what actions are being dispatched. 
+	 *
+	 * `loggerMiddleware` is useful for getting a quick look at what actions are being dispatched.
 	 * In the future, Rodux will have tools similar to [Redux's DevTools](https://github.com/gaearon/redux-devtools).
 	 */
 	export const loggerMiddleware: Rodux.Middleware;
 
 	/**
-	 * A middleware that allows thunks to be dispatched. 
+	 * A middleware that allows thunks to be dispatched.
 	 * Thunks are functions that perform asynchronous tasks or side effects, and can dispatch actions.
-	 * 
+	 *
 	 * `thunkMiddleware` is comparable to Redux's [redux-thunk](https://github.com/gaearon/redux-thunk).
 	 */
 	export const thunkMiddleware: Rodux.ThunkMiddleware;
@@ -70,6 +72,12 @@ declare namespace Rodux {
 	}
 
 	type EnhancedStore<S, A extends Rodux.Action, E = {}> = Store<S, A> & E;
+
+	interface DevTools<S, A extends Rodux.Action = Rodux.AnyAction> {
+		__className: "DevTools";
+	
+		_hookIntoStore(store: Store<S, A>): void;
+	}
 }
 
 declare type ActionFromName<TActions, T extends string> = TActions extends {
@@ -153,7 +161,7 @@ declare namespace Rodux {
 	interface Dispatcher<A extends Action = AnyAction> {
 		/**
 		 * Dispatches an action. The action will travel through all of the store's middlewares before reaching the store's reducer.
-		 * 
+		 *
 		 * Unless handled by middleware, `action` must contain a type field to indicate what type of action it is. No other fields are required.
 		 */
 		dispatch<T extends A>(this: {}, action: T): T;

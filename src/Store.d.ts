@@ -14,13 +14,13 @@ interface Store<S, A extends Rodux.Action = Rodux.AnyAction>
 	changed: Rodux.StoreChangedSignal<S>;
 	/**
 	 * Destroys the store, cleaning up its connections.
-	 * 
+	 *
 	 * > Attempting to use the store after destruct has been called will cause problems.
 	 */
 	destruct(): void;
 	/**
 	 * Flushes the store's pending actions, firing the `changed` event if necessary.
-	 * 
+	 *
 	 * > `flush` is called by Rodux automatically every frame and usually doesn't need to be called manually.
 	 */
 	flush(): void;
@@ -29,8 +29,8 @@ interface Store<S, A extends Rodux.Action = Rodux.AnyAction>
 interface StoreCreator {
 	/**
 	 * Creates and returns a new Store.
-	 * 
-	 * @param reducer is the store's root reducer function, and is invoked whenever an action is dispatched. 
+	 *
+	 * @param reducer is the store's root reducer function, and is invoked whenever an action is dispatched.
 	 * 	It must be a pure function.
 	 * @param initialState is the store's initial state. This should be used to load a saved state from storage.
 	 * @param middleware A is a list of middleware to apply to the store.
@@ -39,21 +39,24 @@ interface StoreCreator {
 	new <S, A extends Rodux.Action = Rodux.AnyAction>(
 		reducer: Rodux.Reducer<S, A>,
 		initialState?: DeepPartial<S>,
-		errorReporter?: Rodux.ErrorReporter<S, A>
+		errorReporter?: Rodux.ErrorReporter<S, A>,
+		devtools?: Rodux.DevTools<S, A>
 	): Store<S, A>;
 
 	new <S, A extends Rodux.Action, Ext1>(
 		reducer: Rodux.Reducer<S, A>,
 		initialState?: DeepPartial<S>,
 		middleware?: [Rodux.Middleware<Ext1, S>],
-		errorReporter?: Rodux.ErrorReporter<S, A>
+		errorReporter?: Rodux.ErrorReporter<S, A>,
+		devtools?: Rodux.DevTools<S, A>
 	): Rodux.EnhancedStore<S, A, Ext1>;
 
 	new <S, A extends Rodux.Action, Ext1, Ext2>(
 		reducer: Rodux.Reducer<S, A>,
 		initialState?: DeepPartial<S>,
 		middleware?: [Rodux.Middleware<Ext1, S>, Rodux.Middleware<Ext2, S>],
-		errorReporter?: Rodux.ErrorReporter<S, A>
+		errorReporter?: Rodux.ErrorReporter<S, A>,
+		devtools?: Rodux.DevTools<S, A>
 	): Rodux.EnhancedStore<S, A, Ext1 & Ext2>;
 
 	new <S, A extends Rodux.Action, Ext1, Ext2, Ext3>(
@@ -64,7 +67,8 @@ interface StoreCreator {
 			Rodux.Middleware<Ext2, S>,
 			Rodux.Middleware<Ext3, S>
 		],
-		errorReporter?: Rodux.ErrorReporter<S, A>
+		errorReporter?: Rodux.ErrorReporter<S, A>,
+		devtools?: Rodux.DevTools<S, A>
 	): Rodux.EnhancedStore<S, A, Ext1 & Ext2 & Ext3>;
 
 	new <S, A extends Rodux.Action, Ext1, Ext2, Ext3, Ext4>(
@@ -76,7 +80,8 @@ interface StoreCreator {
 			Rodux.Middleware<Ext3, S>,
 			Rodux.Middleware<Ext4, S>
 		],
-		errorReporter?: Rodux.ErrorReporter<S, A>
+		errorReporter?: Rodux.ErrorReporter<S, A>,
+		devtools?: Rodux.DevTools<S, A>
 	): Rodux.EnhancedStore<S, A, Ext1 & Ext2 & Ext3 & Ext4>;
 }
 

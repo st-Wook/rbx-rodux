@@ -38,11 +38,16 @@ Store.__index = Store
 	Reducers do not mutate the state object, so the original state is still
 	valid.
 ]]
-function Store.new(reducer, initialState, middlewares, errorReporter)
+function Store.new(reducer, initialState, middlewares, errorReporter, devtools)
 	assert(typeof(reducer) == "function", "Bad argument #1 to Store.new, expected function.")
 	assert(middlewares == nil or typeof(middlewares) == "table", "Bad argument #3 to Store.new, expected nil or table.")
+	assert(
+		devtools == nil or (typeof(devtools) == "table" and devtools.__className == "Devtools"),
+		"Bad argument #5 to Store.new, expected nil or Devtools object."
+	)
+
 	if middlewares ~= nil then
-		for i=1, #middlewares, 1 do
+		for i = 1, #middlewares, 1 do
 			assert(
 				typeof(middlewares[i]) == "function",
 				("Expected the middleware ('%s') at index %d to be a function."):format(tostring(middlewares[i]), i)
@@ -51,16 +56,31 @@ function Store.new(reducer, initialState, middlewares, errorReporter)
 	end
 
 	local self = {}
-
+	self._source = string.match(debug.traceback(), "^.-\n(.-)\n")
 	self._errorReporter = errorReporter or rethrowErrorReporter
 	self._isDispatching = false
+	self._lastState = nil
+	self.changed = Signal.new(self)
+
 	self._reducer = reducer
+	self._flushHandler = function(state)
+		self.changed:fire(state, self._lastState)
+	end
+
+	if devtools then
+		self._devtools = devtools
+
+		-- Devtools can wrap & overwrite self._reducer and self._flushHandler
+		-- to log and profile the store
+		devtools:_hookIntoStore(self)
+	end
+
 	local initAction = {
 		type = "@@INIT",
 	}
 	self._actionLog = { initAction }
 	local ok, result = xpcall(function()
-		self._state = reducer(initialState, initAction)
+		self._state = self._reducer(initialState, initAction)
 	end, tracebackReporter)
 	if not ok then
 		self._errorReporter.reportReducerError(initialState, initAction, {
@@ -73,8 +93,6 @@ function Store.new(reducer, initialState, middlewares, errorReporter)
 
 	self._mutatedSinceFlush = false
 	self._connections = {}
-
-	self.changed = Signal.new(self)
 
 	setmetatable(self, Store)
 
@@ -107,9 +125,13 @@ end
 ]]
 function Store:getState()
 	if self._isDispatching then
-		error(("You may not call store:getState() while the reducer is executing. " ..
-			"The reducer (%s) has already received the state as an argument. " ..
-			"Pass it down from the top reducer instead of reading it from the store."):format(tostring(self._reducer)))
+		error(
+			(
+				"You may not call store:getState() while the reducer is executing. "
+				.. "The reducer (%s) has already received the state as an argument. "
+				.. "Pass it down from the top reducer instead of reading it from the store."
+			):format(tostring(self._reducer))
+		)
 	end
 
 	return self._state
@@ -124,16 +146,16 @@ end
 ]]
 function Store:dispatch(action)
 	if typeof(action) ~= "table" then
-		error(("Actions must be tables. " ..
-			"Use custom middleware for %q actions."):format(typeof(action)),
-			2
-		)
+		error(("Actions must be tables. " .. "Use custom middleware for %q actions."):format(typeof(action)), 2)
 	end
 
 	if action.type == nil then
-		error("Actions may not have an undefined 'type' property. " ..
-			"Have you misspelled a constant? \n" ..
-			tostring(action), 2)
+		error(
+			"Actions may not have an undefined 'type' property. "
+				.. "Have you misspelled a constant? \n"
+				.. tostring(action),
+			2
+		)
 	end
 
 	if self._isDispatching then
@@ -149,14 +171,10 @@ function Store:dispatch(action)
 	self._isDispatching = false
 
 	if not ok then
-		self._errorReporter.reportReducerError(
-			self._state,
-			action,
-			{
-				message = "Caught error in reducer",
-				thrownValue = result,
-			}
-		)
+		self._errorReporter.reportReducerError(self._state, action, {
+			message = "Caught error in reducer",
+			thrownValue = result,
+		})
 	end
 
 	if #self._actionLog == ACTION_LOG_LENGTH then
@@ -194,21 +212,14 @@ function Store:flush()
 	local ok, errorResult = xpcall(function()
 		-- If a changed listener yields, *very* surprising bugs can ensue.
 		-- Because of that, changed listeners cannot yield.
-		NoYield(function()
-			self.changed:fire(state, self._lastState)
-		end)
+		NoYield(self._flushHandler, state)
 	end, tracebackReporter)
 
 	if not ok then
-		self._errorReporter.reportUpdateError(
-			self._lastState,
-			state,
-			self._actionLog,
-			{
-				message = "Caught error flushing store updates",
-				thrownValue = errorResult,
-			}
-		)
+		self._errorReporter.reportUpdateError(self._lastState, state, self._actionLog, {
+			message = "Caught error flushing store updates",
+			thrownValue = errorResult,
+		})
 	end
 
 	self._lastState = state

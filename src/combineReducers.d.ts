@@ -5,7 +5,7 @@ type ReducerMap<S, A extends Rodux.Action> = {
 
 /**
  * A helper function that can be used to combine multiple reducers into a new reducer.
- * 
+ *
  * `combineReducers` is functionally equivalent to writing:
  * ```ts
  * function reducer(state: S, action: A) {
@@ -15,9 +15,9 @@ type ReducerMap<S, A extends Rodux.Action> = {
  * 		}
  * }
  * ```
- * 
+ *
  * @param reducers The reducers to combine
- * 
+ *
  * https://roblox.github.io/rodux/api-reference/#roduxcombinereducers
  */
 declare function combineReducers<S, A extends Rodux.Action>(
