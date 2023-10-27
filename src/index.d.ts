@@ -8,13 +8,7 @@ import makeThunkMiddleware from "./makeThunkMiddleware";
  * The `Rodux` library for Roblox
  */
 declare namespace Rodux {
-	export {
-		createReducer,
-		combineReducers,
-		Store,
-		makeActionCreator,
-		makeThunkMiddleware,
-	};
+	export { createReducer, combineReducers, Store, makeActionCreator, makeThunkMiddleware };
 }
 
 declare namespace Rodux {
@@ -45,7 +39,7 @@ declare namespace Rodux {
 	type ErrorReporterCallback<S, A> = (
 		prevState: Readonly<S>,
 		action: Rodux.Action<A>,
-		errorResult: ErrorResult
+		errorResult: ErrorResult,
 	) => void;
 
 	/**
@@ -66,16 +60,14 @@ declare namespace Rodux {
 		disconnect(): void;
 	}
 	interface StoreChangedSignal<S> {
-		connect(
-			handler: (newState: Readonly<S>, oldState: Readonly<S>) => void
-		): Signal;
+		connect(handler: (newState: Readonly<S>, oldState: Readonly<S>) => void): Signal;
 	}
 
 	type EnhancedStore<S, A extends Rodux.Action, E = {}> = Store<S, A> & E;
 
 	interface DevTools<S, A extends Rodux.Action = Rodux.AnyAction> {
 		__className: "DevTools";
-	
+
 		_hookIntoStore(store: Store<S, A>): void;
 	}
 }
@@ -106,20 +98,13 @@ declare namespace Rodux {
 	 * An object of action handlers
 	 */
 	type ActionHandlers<TState, TAction extends Action> = {
-		[TType in TAction["type"]]: (
-			reducerState: TState,
-			action: ActionFromName<TAction, TType>
-		) => TState;
+		[TType in TAction["type"]]: (reducerState: TState, action: ActionFromName<TAction, TType>) => TState;
 	};
 
 	/**
 	 * An action creator, made with `Rodux.makeActionCreator`.
 	 */
-	interface ActionCreator<
-		TName extends string,
-		TArgument extends unknown[],
-		TActionProps
-	> {
+	interface ActionCreator<TName extends string, TArgument extends unknown[], TActionProps> {
 		name: TName;
 		(...values: TArgument): TActionProps & Rodux.Action<TName>;
 	}
@@ -139,9 +124,13 @@ declare namespace Rodux {
 	 * type SetFooAction = Rodux.InferActionFromCreator<typeof setFoo>;
 	 * ```
 	 */
-	type InferActionFromCreator<
-		T extends ActionCreator<string, any, any>
-	> = T extends ActionCreator<infer N, any, infer P> ? Action<N> & P : never;
+	type InferActionFromCreator<T extends ActionCreator<string, any, any>> = T extends ActionCreator<
+		infer N,
+		any,
+		infer P
+	>
+		? Action<N> & P
+		: never;
 }
 
 // Reducers
@@ -191,17 +180,12 @@ declare namespace Rodux {
 		dispatch<R>(this: {}, action: (store: S) => Promise<R>): Promise<R>;
 	}
 
-	type ThunkMiddleware<
-		S = {},
-		A extends Action = AnyAction,
-		E = undefined
-	> = Middleware<Rodux.ThunkDispatcher<Rodux.EnhancedStore<S, A>, A>, S>;
+	type ThunkMiddleware<S = {}, A extends Action = AnyAction, E = undefined> = Middleware<
+		Rodux.ThunkDispatcher<Rodux.EnhancedStore<S, A>, A>,
+		S
+	>;
 
-	type DispatchParam<TStore> = TStore extends Rodux.EnhancedStore<
-		infer S,
-		infer A,
-		infer E
-	>
+	type DispatchParam<TStore> = TStore extends Rodux.EnhancedStore<infer S, infer A, infer E>
 		? E extends Rodux.ThunkDispatcher<any, any>
 			? {
 					(action: A): A;

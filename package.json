@@ -24,6 +24,8 @@
 		}
 	],
 	"devDependencies": {
-		"@rbxts/compiler-types": "^1.0.0-types.0"
+		"@rbxts/compiler-types": "^1.0.0-types.0",
+		"@rbxts/types": "^1.0.729",
+		"prettier": "^3.0.3"
 	}
 }

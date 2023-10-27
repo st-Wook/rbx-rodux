@@ -1,3 +1,5 @@
+/// <reference types="@rbxts/types" />
+
 import Rodux from "./index";
 
 /**
@@ -54,9 +56,9 @@ import Rodux from "./index";
 declare function makeActionCreator<
 	TName extends string,
 	TParams extends unknown[],
-	TActionProps extends Record<string, {}>
+	TActionProps extends Record<string, {} | undefined>,
 >(
 	name: TName,
-	actionGeneratorFunction: (...args: TParams) => TActionProps
+	actionGeneratorFunction: (...args: TParams) => TActionProps,
 ): Rodux.ActionCreator<TName, TParams, TActionProps>;
 export = makeActionCreator;

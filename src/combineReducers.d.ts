@@ -20,7 +20,5 @@ type ReducerMap<S, A extends Rodux.Action> = {
  *
  * https://roblox.github.io/rodux/api-reference/#roduxcombinereducers
  */
-declare function combineReducers<S, A extends Rodux.Action>(
-	reducers: ReducerMap<S, A>
-): Rodux.Reducer<S, A>;
+declare function combineReducers<S, A extends Rodux.Action>(reducers: ReducerMap<S, A>): Rodux.Reducer<S, A>;
 export = combineReducers;

@@ -2,8 +2,7 @@ import Rodux from "./index";
 
 type DeepPartial<T> = { [K in keyof T]?: DeepPartial<T[K]> };
 
-interface Store<S, A extends Rodux.Action = Rodux.AnyAction>
-	extends Rodux.Dispatcher<A> {
+interface Store<S, A extends Rodux.Action = Rodux.AnyAction> extends Rodux.Dispatcher<A> {
 	/**
 	 * Gets the store's current state.
 	 */
@@ -40,7 +39,7 @@ interface StoreCreator {
 		reducer: Rodux.Reducer<S, A>,
 		initialState?: DeepPartial<S>,
 		errorReporter?: Rodux.ErrorReporter<S, A>,
-		devtools?: Rodux.DevTools<S, A>
+		devtools?: Rodux.DevTools<S, A>,
 	): Store<S, A>;
 
 	new <S, A extends Rodux.Action, Ext1>(
@@ -48,7 +47,7 @@ interface StoreCreator {
 		initialState?: DeepPartial<S>,
 		middleware?: [Rodux.Middleware<Ext1, S>],
 		errorReporter?: Rodux.ErrorReporter<S, A>,
-		devtools?: Rodux.DevTools<S, A>
+		devtools?: Rodux.DevTools<S, A>,
 	): Rodux.EnhancedStore<S, A, Ext1>;
 
 	new <S, A extends Rodux.Action, Ext1, Ext2>(
@@ -56,19 +55,15 @@ interface StoreCreator {
 		initialState?: DeepPartial<S>,
 		middleware?: [Rodux.Middleware<Ext1, S>, Rodux.Middleware<Ext2, S>],
 		errorReporter?: Rodux.ErrorReporter<S, A>,
-		devtools?: Rodux.DevTools<S, A>
+		devtools?: Rodux.DevTools<S, A>,
 	): Rodux.EnhancedStore<S, A, Ext1 & Ext2>;
 
 	new <S, A extends Rodux.Action, Ext1, Ext2, Ext3>(
 		reducer: Rodux.Reducer<S, A>,
 		initialState?: DeepPartial<S>,
-		middleware?: [
-			Rodux.Middleware<Ext1, S>,
-			Rodux.Middleware<Ext2, S>,
-			Rodux.Middleware<Ext3, S>
-		],
+		middleware?: [Rodux.Middleware<Ext1, S>, Rodux.Middleware<Ext2, S>, Rodux.Middleware<Ext3, S>],
 		errorReporter?: Rodux.ErrorReporter<S, A>,
-		devtools?: Rodux.DevTools<S, A>
+		devtools?: Rodux.DevTools<S, A>,
 	): Rodux.EnhancedStore<S, A, Ext1 & Ext2 & Ext3>;
 
 	new <S, A extends Rodux.Action, Ext1, Ext2, Ext3, Ext4>(
@@ -78,10 +73,10 @@ interface StoreCreator {
 			Rodux.Middleware<Ext1, S>,
 			Rodux.Middleware<Ext2, S>,
 			Rodux.Middleware<Ext3, S>,
-			Rodux.Middleware<Ext4, S>
+			Rodux.Middleware<Ext4, S>,
 		],
 		errorReporter?: Rodux.ErrorReporter<S, A>,
-		devtools?: Rodux.DevTools<S, A>
+		devtools?: Rodux.DevTools<S, A>,
 	): Rodux.EnhancedStore<S, A, Ext1 & Ext2 & Ext3 & Ext4>;
 }
 
