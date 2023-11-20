@@ -1,7 +1,7 @@
 local RunService = game:GetService("RunService")
 
-local Signal = require(script.Parent.Signal)
 local NoYield = require(script.Parent.NoYield)
+local Signal = require(script.Parent.Signal)
 
 local ACTION_LOG_LENGTH = 3
 

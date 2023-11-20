@@ -1,10 +1,10 @@
 local Store = require(script.Store)
-local createReducer = require(script.createReducer)
 local combineReducers = require(script.combineReducers)
-local makeActionCreator = require(script.makeActionCreator)
+local createReducer = require(script.createReducer)
 local loggerMiddleware = require(script.loggerMiddleware)
-local thunkMiddleware = require(script.thunkMiddleware)
+local makeActionCreator = require(script.makeActionCreator)
 local makeThunkMiddleware = require(script.makeThunkMiddleware)
+local thunkMiddleware = require(script.thunkMiddleware)
 
 return {
 	Store = Store,
