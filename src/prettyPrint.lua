@@ -9,7 +9,7 @@ local function prettyPrint(value, _indentLevel: number?)
 		table.insert(output, "{\n")
 
 		for tableKey, tableValue in pairs(value) do
-			table.insert(output, indent:rep(indentLevel + 1))
+			table.insert(output, string.rep(indent, indentLevel + 1))
 			table.insert(output, tostring(tableKey))
 			table.insert(output, " = ")
 
@@ -17,7 +17,7 @@ local function prettyPrint(value, _indentLevel: number?)
 			table.insert(output, "\n")
 		end
 
-		table.insert(output, indent:rep(indentLevel))
+		table.insert(output, string.rep(indent, indentLevel))
 		table.insert(output, "}")
 	elseif typeof(value) == "string" then
 		table.insert(output, string.format("%q", value))

@@ -14,9 +14,7 @@ local function makeThunkMiddleware(extraArgument)
 	local function thunkMiddleware(nextDispatch, store)
 		return function(action)
 			if typeof(action) == "function" then
-				local ok, result = xpcall(function()
-					return action(store, extraArgument)
-				end, tracebackReporter)
+				local ok, result = xpcall(action, tracebackReporter, store, extraArgument)
 
 				if not ok then
 					-- report the error and move on so it's non-fatal app

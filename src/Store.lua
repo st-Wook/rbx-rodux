@@ -50,7 +50,11 @@ function Store.new(reducer, initialState, middlewares, errorReporter, devtools)
 		for i = 1, #middlewares, 1 do
 			assert(
 				typeof(middlewares[i]) == "function",
-				("Expected the middleware ('%s') at index %d to be a function."):format(tostring(middlewares[i]), i)
+				string.format(
+					"Expected the middleware ('%s') at index %d to be a function.",
+					tostring(middlewares[i]),
+					i
+				)
 			)
 		end
 	end
@@ -126,11 +130,12 @@ end
 function Store:getState()
 	if self._isDispatching then
 		error(
-			(
+			string.format(
 				"You may not call store:getState() while the reducer is executing. "
-				.. "The reducer (%s) has already received the state as an argument. "
-				.. "Pass it down from the top reducer instead of reading it from the store."
-			):format(tostring(self._reducer))
+					.. "The reducer (%s) has already received the state as an argument. "
+					.. "Pass it down from the top reducer instead of reading it from the store.",
+				tostring(self._reducer)
+			)
 		)
 	end
 
@@ -146,7 +151,7 @@ end
 ]]
 function Store:dispatch(action)
 	if typeof(action) ~= "table" then
-		error(("Actions must be tables. " .. "Use custom middleware for %q actions."):format(typeof(action)), 2)
+		error(string.format("Actions must be tables. " .. "Use custom middleware for %q actions.", typeof(action)), 2)
 	end
 
 	if action.type == nil then
@@ -209,11 +214,9 @@ function Store:flush()
 	-- unless we cache this value first
 	local state = self._state
 
-	local ok, errorResult = xpcall(function()
-		-- If a changed listener yields, *very* surprising bugs can ensue.
-		-- Because of that, changed listeners cannot yield.
-		NoYield(self._flushHandler, state)
-	end, tracebackReporter)
+	-- If a changed listener yields, *very* surprising bugs can ensue.
+	-- Because of that, changed listeners cannot yield.
+	local ok, errorResult = xpcall(NoYield, tracebackReporter, self._flushHandler, state)
 
 	if not ok then
 		self._errorReporter.reportUpdateError(self._lastState, state, self._actionLog, {

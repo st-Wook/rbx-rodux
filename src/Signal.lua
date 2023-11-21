@@ -89,7 +89,8 @@ function Signal:connect(callback)
 	local function disconnect()
 		if listener.disconnected then
 			error(
-				("Listener connected at: \n%s\n" .. "was already disconnected at: \n%s\n"):format(
+				string.format(
+					"Listener connected at: \n%s\n" .. "was already disconnected at: \n%s\n",
 					tostring(listener.connectTraceback),
 					tostring(listener.disconnectTraceback)
 				)

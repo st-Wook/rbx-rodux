@@ -14,7 +14,11 @@ function loggerMiddleware.middleware(nextDispatch, store)
 		local result = nextDispatch(action)
 
 		loggerMiddleware.outputFunction(
-			("Action dispatched: %s\nState changed to: %s"):format(prettyPrint(action), prettyPrint(store:getState()))
+			string.format(
+				"Action dispatched: %s\nState changed to: %s",
+				prettyPrint(action),
+				prettyPrint(store:getState())
+			)
 		)
 
 		return result
